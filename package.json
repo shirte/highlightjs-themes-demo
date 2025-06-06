@@ -1,0 +1,25 @@
+{
+    "name": "highlightjs-themes-demo",
+    "version": "1.0.0",
+    "description": "Demo of all highlight.js themes with screenshots",
+    "scripts": {
+        "install-themes": "node scripts/install-themes.js",
+        "generate": "node scripts/generate.js",
+        "build": "npm run generate"
+    },
+    "dependencies": {
+        "highlight.js": "^11.9.0"
+    },
+    "devDependencies": {
+        "puppeteer": "^24.10.0",
+        "fs-extra": "^11.2.0"
+    },
+    "keywords": [
+        "highlight.js",
+        "syntax-highlighting",
+        "themes",
+        "demo"
+    ],
+    "author": "",
+    "license": "MIT"
+}
