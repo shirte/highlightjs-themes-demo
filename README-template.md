@@ -1,21 +1,23 @@
 # Highlight.js Themes Showcase
 
-A comprehensive visual guide to all available [Highlight.js](https://highlightjs.org/) themes, showcasing syntax highlighting for Python code. 
+A visual guide to all {{THEME_COUNT}} [Highlight.js](https://highlightjs.org/) themes, showcasing syntax highlighting for Python code. 
 
 {{LIMITED_MODE_WARNING}}
 
-## 🎯 Theme Gallery
+## 🎨 Theme Gallery
 
 {{ALL_THEMES}}
 
 ## 🛠️ Technical Details
 
 ### Technologies Used
+
 - **Highlight.js 11.9.0** - Syntax highlighting library
 - **Puppeteer 24.10.0** - Automated screenshot generation
 - **Node.js** - Build system and automation
 
 ### Project Structure
+
 ```
 highlightjs-themes-demo/
 ├── demo.html              # HTML template for theme display
@@ -31,21 +33,23 @@ highlightjs-themes-demo/
 
 ### Syntax Elements Showcased
 The demo Python code demonstrates syntax highlighting for:
-- **Import statements** (`import asyncio`, `from typing`)
-- **Decorators** (`@property`)
-- **Type annotations** (`List[str]`, `AsyncGenerator[str, None]`)
-- **Async/generators** (`async def`, `yield`, `AsyncGenerator`)
+- **Import statements** (`from typing import`)
+- **Decorators** (`@profile`)
+- **Type annotations** (`List[Tuple[str, int]]`, `Generator[str, None]`, `int`)
+- **Function definitions** (`def process_repositories`)
 - **Docstrings** (function documentation strings)
-- **Regular expressions** (`r"^[a-zA-Z0-9._%+-]+@..."`)
-- **F-strings** (`f"Valid: {email} (#{count + 1})"`)
-- **String literals** (raw strings, regular strings)
-- **Numbers** (`100`, `0.1`, `1`, `2`)
-- **Comments** (`# Track processed emails`)
-- **Operators** (`>=`, `+`, `+=`)
-- **Keywords** (`async`, `await`, `yield`, `if`, `for`, `break`)
-- **Built-in functions** (`strip()`, `match()`)
+- **Tuple unpacking** (`(name, n_stars)`)
+- **Enumerate function** (`enumerate(repos)`)
+- **F-strings** (`f"Repo {i}: {name} ({n_stars} stars)"`)
+- **String literals** (regular strings)
+- **Numbers** (`100`)
+- **Comments** (`# Check number of stars and format output`)
+- **Operators** (`>=`)
+- **Keywords** (`def`, `yield`, `if`, `for`)
+- **Built-in functions** (`enumerate()`)
 
 ## Running the Generator
+
 To regenerate screenshots or adapt for different code samples:
 
 ```bash
@@ -56,11 +60,8 @@ npm install
 node scripts/generate.js
 ```
 
-## 📊 Statistics
-- **Total themes available**: {{TOTAL_THEMES}}
-- **Themes displayed**: {{THEME_COUNT}}
+## ⭐ Popular Themes
 
-## 🎨 Popular Themes
 Some of the most popular and widely-used themes include:
 - **GitHub** - Clean, professional light theme
 - **GitHub Dark** - Modern dark variant of GitHub theme
