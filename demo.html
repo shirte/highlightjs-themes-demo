@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highlight.js Theme Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+
+        .theme-container {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .code-container {
+            border-radius: 0;
+            overflow: hidden;
+            margin: 0;
+            max-width: 800px;
+            width: fit-content;
+        }
+
+        pre {
+            margin: 0;
+            padding: 0;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre;
+            box-sizing: border-box;
+        }
+
+        code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            padding: 12px;
+            display: block;
+        }
+    </style>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"
+        id="theme-link">
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+
+<body>
+    <div class="theme-container" id="demo-container">
+        <!-- Python Example -->
+        <div class="code-container">
+            <pre><code class="language-python">{{PYTHON_CODE_PLACEHOLDER}}</code></pre>
+        </div>
+    </div>
+
+    <script>
+        // Initialize highlight.js
+        hljs.highlightAll();
+
+        // Function to change theme
+        function changeTheme(themeName) {
+            const themeLink = document.getElementById('theme-link');
+
+            themeLink.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/${themeName}.min.css`;
+
+            // Re-highlight code after theme change
+            setTimeout(() => {
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+            }, 100);
+        }
+
+        // Expose changeTheme function globally for screenshot script
+        window.changeTheme = changeTheme;
+    </script>
+</body>
+
+</html>
