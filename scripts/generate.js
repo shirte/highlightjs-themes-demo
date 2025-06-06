@@ -133,6 +133,18 @@ async function generateScreenshots() {
     console.log('Starting screenshot generation...');
     console.log(`Mode: ${fullMode ? 'Full (all themes)' : 'Limited (first 10 themes)'}`);
     
+    // Download and cache highlight.js code once
+    console.log('Downloading highlight.js...');
+    const https = require('https');
+    const highlightjsCode = await new Promise((resolve, reject) => {
+        https.get('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js', (res) => {
+            let data = '';
+            res.on('data', (chunk) => data += chunk);
+            res.on('end', () => resolve(data));
+        }).on('error', reject);
+    });
+    console.log('Highlight.js downloaded successfully');
+    
     // Dynamically discover themes from the highlight.js package
     const allThemes = await discoverThemes();
     
@@ -155,20 +167,17 @@ async function generateScreenshots() {
     // Read the Python demo code
     const pythonCode = await fs.readFile('./demo-code.py', 'utf8');
     
-    // Read the HTML template and inject the Python code
+    // Read the HTML template
     const htmlTemplate = await fs.readFile('./demo.html', 'utf8');
-    const htmlContent = htmlTemplate.replace('{{PYTHON_CODE_PLACEHOLDER}}', pythonCode);
     
-    // Write the processed HTML to a temporary file in the system temp directory
-    const tempHtmlPath = path.join(os.tmpdir(), `highlightjs-demo-${Date.now()}.html`);
-    await fs.writeFile(tempHtmlPath, htmlContent);
-    
-    // Ensure screenshots directory exists
+    // Clean up and recreate screenshots directory
+    console.log('Cleaning up existing screenshots...');
+    await fs.remove('./screenshots');
     await fs.ensureDir('./screenshots');
     
-    // Launch browser
+    // Launch browser in debug mode (visible window)
     const browser = await puppeteer.launch({
-        headless: 'new',
+        headless: "new",
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     
@@ -180,9 +189,6 @@ async function generateScreenshots() {
         height: 800
     });
     
-    // Navigate to demo page
-    await page.goto(`file://${tempHtmlPath}`);
-    
     console.log(`Generating screenshots for ${themes.length} themes...`);
     
     for (let i = 0; i < themes.length; i++) {
@@ -190,15 +196,35 @@ async function generateScreenshots() {
         console.log(`Processing theme ${i + 1}/${themes.length}: ${theme}`);
         
         try {
-            // Change theme
-            await page.evaluate((themeName) => {
-                window.changeTheme(themeName);
-            }, theme);
+            // Create local file path for theme CSS and read its content
+            const themeCssPath = path.resolve(__dirname, '..', 'node_modules', 'highlight.js', 'styles', `${theme}.min.css`);
+            let themeCssContent = '';
             
-            // Wait for theme to load and apply
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            try {
+                themeCssContent = await fs.readFile(themeCssPath, 'utf8');
+            } catch (err) {
+                // If .min.css doesn't exist, try .css
+                const fallbackPath = themeCssPath.replace('.min.css', '.css');
+                themeCssContent = await fs.readFile(fallbackPath, 'utf8');
+            }
             
-            // Take screenshot of just the code element, not the full container
+            // Create HTML content with inlined CSS and JS
+            const htmlContent = htmlTemplate
+                .replace('{{PYTHON_CODE_PLACEHOLDER}}', pythonCode)
+                .replace('{{THEME_CSS_CONTENT}}', themeCssContent)
+                .replace('{{HIGHLIGHTJS_CODE}}', highlightjsCode);
+            
+            // Write HTML file for this theme to temp directory
+            const tempHtmlPath = path.join(os.tmpdir(), `highlightjs-demo-${theme.replace(/\//g, '_')}-${Date.now()}.html`);
+            await fs.writeFile(tempHtmlPath, htmlContent);
+            
+            // Navigate to the theme-specific HTML file
+            await page.goto(`file://${tempHtmlPath}`, { waitUntil: 'domcontentloaded' });
+            
+            // Wait for highlight.js to complete processing
+            await page.waitForFunction(() => window.highlightingComplete === true, { timeout: 10000 });
+            
+            // Take screenshot of just the code element
             const codeElement = await page.$('pre code');
             if (codeElement) {
                 const screenshotPath = `./screenshots/${theme.replace(/\//g, '_')}.png`;
@@ -207,15 +233,16 @@ async function generateScreenshots() {
                     type: 'png'
                 });
             }
+            
+            // Clean up the temporary HTML file
+            await fs.remove(tempHtmlPath);
+            
         } catch (error) {
             console.error(`Error processing theme ${theme}:`, error);
         }
     }
     
     await browser.close();
-    
-    // Clean up temporary file
-    await fs.remove(tempHtmlPath);
     
     console.log('Screenshot generation complete!');
     

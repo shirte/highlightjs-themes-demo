@@ -45,12 +45,11 @@
             padding: 12px;
             display: block;
         }
+        
+        /* Theme-specific styles will be injected here */
+        {{THEME_CSS_CONTENT}}
     </style>
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"
-        id="theme-link">
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script type="text/javascript">{{HIGHLIGHTJS_CODE}}</script>
 </head>
 
 <body>
@@ -62,25 +61,14 @@
     </div>
 
     <script>
-        // Initialize highlight.js
+        // Initialize highlight.js and signal when complete
         hljs.highlightAll();
 
-        // Function to change theme
-        function changeTheme(themeName) {
-            const themeLink = document.getElementById('theme-link');
+        // Signal that highlighting is complete
+        window.highlightingComplete = true;
 
-            themeLink.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/${themeName}.min.css`;
-
-            // Re-highlight code after theme change
-            setTimeout(() => {
-                document.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightElement(block);
-                });
-            }, 100);
-        }
-
-        // Expose changeTheme function globally for screenshot script
-        window.changeTheme = changeTheme;
+        // Also dispatch a custom event for more robust detection
+        document.dispatchEvent(new CustomEvent('highlightingComplete'));
     </script>
 </body>
 
